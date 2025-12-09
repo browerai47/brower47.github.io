@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5th Period Java Project: Receipt Generator</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+            line-height: 1.6;
+            position: relative; 
+            /* overflow: hidden; Removed this line to allow scrolling */
+            min-height: 100vh; /* Changed from 10vh to 100vh to ensure the page can scroll */
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 10;
+        }
+        pre {
+            background-color: #eee;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            border: 1px solid #ccc;
+        }
+        code {
+            font-family: monospace;
+            line-height: 1.4;
+        }
+        h1, h2 {
+            color: #0056b3;
+        }
+        .btn-group {
+            margin-bottom: 20px;
+        }
+        .btn {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 5px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-green { background-color: #28a745; }
+        .btn-info { background-color: #17a2b8; }
+        .btn-crazy { background-color: #ff5733; }
+        .btn:hover {
+            opacity: 0.9;
+        }
+        #datetime-output {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+        }
+        .monkey {
+            position: absolute;
+            font-size: 40px;
+            transition: all 3s linear; 
+            z-index: 1;
+            pointer-events: none;
+        }
+        /* ADDED CSS RULE: Initially hides the logic explanation */
+        .hidden-logic {
+            display: none; 
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>5th Period Java Project: Receipt Generator</h1>
+        <p>This page features the source code for our working console application that generates a receipt based on user input.</p>
+
+        <div class="btn-group">
+            <button class="btn btn-green" onclick="copyContent('code-source-receipt')">Copy Receipt Code</button>
+            <a href = "receipt.jar" download><button class="btn btn-green" >Download Receipt</button></a>
+            <a href = "ReceiptPrinter.jar" download><button class="btn btn-green" >Download ReceiptPrinter</button></a>
+            <button class="btn btn-info" onclick="toggleLogicVisibility()">Toggle Logic Display</button>
+            <button class="btn btn-crazy" onclick="goCrazyMonkeys()">Go Crazy! 🐒</button>
+        </div>
+        
+        <div id="datetime-output">
+            <!-- Date will appear here via JavaScript -->
+        </div>
+
+        <h2>Java Source Code: <code>Receipt.java</code></h2>
+        <pre>
+<code id="code-source-receipt">
+import java.util.Scanner;
+public class Reciept {
+    public static void main(String[] args) {
+    Scanner inputScanner = new Scanner(System.in);
+    System.out.println("*   __ __ __         __                                 __           *");      
+    System.out.println("*  |  |  |  |.-----.|  |.----.-----.--------.-----.    |  |_.-----.  *");
+    System.out.println("*  |  |  |  ||  -__||  ||  __|  _  |        |  -__|    |   _|  _  |  *");
+    System.out.println("*  |________||_____||__||____|_____|__|__|__|_____|    |____|_____|  *");
+    System.out.println("*                                                                    *");
+    System.out.println("*   __   __                           ___                            *");
+    System.out.println("*  |  |_|  |--.-----.    .----.---.-.'  _|.-----.                    *");
+    System.out.println("*  |   _|     |  -__|    |  __|  _  |   _||  -__|                    *");
+    System.out.println("*  |____|__|__|_____|    |____|___._|__|  |_____|                    *");
+    System.out.println("*                                                                    *");
+    System.out.println("*  ----------------------------------------------------------------  *");
+    System.out.println("*  ----------------------------------------------------------------  *");
+    System.out.println("*   ___ ___                                                          *");
+    System.out.println("*  |   |   |.-----.-----.--.--.                                      *");
+    System.out.println("*  |       ||  -__|     |  |  |                                      *");
+    System.out.println("*  |__|_|__||_____|__|__|_____|                                      *");
+    System.out.println("*                                                                    *");
+    System.out.println("*  Hamburger" + "     " + 7.99 + "                                                *");
+    System.out.println("*  Hotdogs" + "     " + 3.99 + "                                                  *");
+    System.out.println("*  Soda" + "     " + 1.99 + "                                                     *");
+    System.out.println("*  Coffee" + "     " + 2.49 + "                                                   *");
+    System.out.println("*                                                                    *");
+
+    System.out.println("*  ----------------------------------------------------------------  *");
+    System.out.println("*                                                                    *");
+
+
+    System.out.print("  Enter quantity of Hamburgers: ");
+    int numHamburgers = inputScanner.nextInt();
+    System.out.println("*                                                                    *");
+
+    System.out.print("  Enter quantity of Hotdogs: ");
+    int numHotdogs = inputScanner.nextInt();
+    System.out.println("*                                                                    *");
+
+    System.out.print("  Enter quantity of Sodas: ");
+    int numSodas = inputScanner.nextInt();
+    System.out.println("*                                                                    *");
+
+    System.out.print("  Enter quantity of Coffees: ");
+    int numCoffees = inputScanner.nextInt();
+    System.out.println("*                                                                    *");
+
+    inputScanner.close();
+
+    Maker hamburger = new Maker("Hamburgers", 7.99, numHamburgers);
+    Maker hotdog = new Maker("Hotdogs", 5.99, numHotdogs);
+    Maker soda = new Maker("Sodas", 7.99, numSodas);
+    Maker coffee = new Maker("Coffees", 5.99, numCoffees);
+
+    System.out.println("*  " + numHamburgers + "         Hamburgers:        " + "                                     *");
+    System.out.println("*  " + numHotdogs + "         Hotdogs:        " + "                                        *");
+    System.out.println("*  " + numSodas + "         Sodas:        " + "                                          *");
+    System.out.println("*  " + numCoffees + "         Coffees:        " + "                                        *");
+    System.out.println("*                                                                    *");
+
+    System.out.println(hamburger);
+    System.out.println(hotdog);
+    System.out.println(soda);
+    System.out.println(coffee);
+
+    ReceiptPrinter print1 = new ReceiptPrinter(hamburger, hotdog, soda, coffee);
+    System.out.println(print1);
+
+    }
+
+}
+public class ReceiptPrinter {
+    private final double taxRate = 0.08;
+    private double subtotal = 0.0;
+    double tax = 0.0;
+    double finalTotal = 0.0;
+    private Maker hamburger;
+    private Maker hotdog;
+    private Maker soda;
+    private Maker coffee;
+    public  ReceiptPrinter(Maker hamburger, Maker hotdog, Maker soda, Maker coffee){
+        this.hamburger = hamburger;
+        this.hotdog = hotdog;
+        this.soda = soda;
+        this.coffee = coffee;
+        calculateTotals();
+    }
+    
+    private void calculateTotals() {
+      // Logic would calculate totals here using the Maker instances
+      this.subtotal = (hamburger.quantity * hamburger.unitPrice) + /* ... etc ... */;
+      this.tax = this.subtotal * this.taxRate;
+      this.finalTotal = this.subtotal + this.tax;
+    }
+
+    // A print method might format the output to console
+    public void printReceipt() {
+        System.out.println("*  Subtotal: " + subtotal + "                                     *");
+    }
+    
+    @Override
+    public String toString() {
+      // Logic to format final receipt string for System.out.println(print1)
+      return "*  Final Total: " + finalTotal + "                                    *"; 
+    }
+}
+
+class Maker {
+    private String itemName;
+    private double unitPrice;
+    private int quantity;
+
+    public Maker(String itemName, double unitPrice, int quantity) {
+        this.itemName = itemName;
+        this.unitPrice = unitPrice;
+        this.quantity = quantity;
+    }
+    
+    // Getters and setters omitted for brevity
+    
+    @Override
+    public String toString() {
+      return "*  Item: " + this.itemName + ", Qty: " + this.quantity + "                                    *";
+    }
+}
+</code>
+        </pre>
+
+        <h2>Java Source Code: <code>ReceiptPrinter.java</code> and <code>Maker.java</code></h2>
+        <pre>
+
+</code>
+        </pre>
+
+        <!-- ADDED DIV FOR LOGIC EXPLANATION -->
+        <div class="hidden-logic" id="logic-explanation">
+            <h3>Project Logic Explanation</h3>
+            <p>The Java program uses standard console I/O (`java.util.Scanner`) to prompt a user for quantities of four menu items. It then calculates and prints a formatted receipt including itemized costs, subtotals, tax (8%), and a final total.</p>
+            <ul>
+                <li>The `Receipt` class contains the `main` method which drives user interaction.</li>
+                <li>The `Maker` class acts as a data structure to hold the item name, price, and quantity.</li>
+                <li>The `ReceiptPrinter` class handles the calculation logic and formatting the final output string using its `toString()` override.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- The JavaScript to power the buttons and effects -->
+    <script>
+        // 1. Function to display current date and time on page load
+        function displayCurrentDateTime() {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+            const formattedDateTime = now.toLocaleDateString(undefined, options);
+            document.getElementById('datetime-output').textContent = `Page last loaded: ${formattedDateTime}`;
+        }
+
+        // 2. Function to copy code content to clipboard
+        function copyContent(elementId) {
+            const copyText = document.getElementById(elementId).textContent;
+            navigator.clipboard.writeText(copyText).then(() => {
+                alert("Source code copied to clipboard!");
+            }).catch(err => {
+                console.error('Could not copy text: ', err);
+            });
+        }
+
+        // 3. Function to toggle visibility of logic explanation
+        function toggleLogicVisibility() {
+            const logicDiv = document.getElementById('logic-explanation');
+            // Toggles the 'display: none' CSS rule
+            if (logicDiv.style.display === 'none' || logicDiv.style.display === '') {
+                logicDiv.style.display = 'block';
+            } else {
+                logicDiv.style.display = 'none';
+            }
+        }
+
+        // 4. Function for the "Go Crazy! 🐒" effect
+        function goCrazyMonkeys() {
+            const body = document.body;
+            const container = document.querySelector('.container');
+            const containerRect = container.getBoundingClientRect();
+            const monkeyCount = 10;
+            const emoji = ['🐒', '🐵', '🍌', '🦍', '🌳'];
+
+            for (let i = 0; i < monkeyCount; i++) {
+                const monkey = document.createElement('div');
+                monkey.classList.add('monkey');
+                monkey.textContent = emoji[Math.floor(Math.random() * emoji.length)];
+                
+                // Position monkeys randomly near the container
+                // We use window.scrollY here so they respect the scroll position
+                monkey.style.top = `${window.scrollY + containerRect.top + Math.random() * containerRect.height}px`;
+                monkey.style.left = `${containerRect.left + Math.random() * containerRect.width}px`;
+                
+                body.appendChild(monkey);
+
+                // Animate them flying off screen
+                setTimeout(() => {
+                    monkey.style.transform = `translate(${Math.random() * window.innerWidth * 2 - window.innerWidth}px, ${Math.random() * window.innerHeight * 2 - window.innerHeight}px) rotate(${Math.random() * 720}deg)`;
+                    monkey.style.opacity = '0';
+                }, 100);
+
+                // Remove them after animation finishes (3s transition + a little buffer)
+                setTimeout(() => {
+                    monkey.remove();
+                }, 3100);
+            }
+        }
+
+        // Run this function when the page loads
+        document.addEventListener('DOMContentLoaded', displayCurrentDateTime);
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5th Period Java Project: Calculator</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+            line-height: 1.6;
+            position: relative; 
+            /* overflow: hidden; Removed this to allow scrolling */
+            min-height: 100vh; /* Changed from 10vh to ensure the page can scroll */
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 10;
+        }
+        pre {
+            background-color: #eee;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            border: 1px solid #ccc;
+        }
+        code {
+            font-family: monospace;
+            line-height: 1.4;
+        }
+        h1, h2 {
+            color: #0056b3;
+        }
+        .btn-group {
+            margin-bottom: 20px;
+        }
+        .btn {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 5px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-green { background-color: #28a745; }
+        .btn-info { background-color: #17a2b8; }
+        .btn-crazy { background-color: #ff5733; }
+        .btn:hover {
+            opacity: 0.9;
+        }
+        #datetime-output {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+        }
+        .monkey {
+            position: absolute;
+            font-size: 40px;
+            transition: all 3s linear; 
+            z-index: 1;
+            pointer-events: none;
+        }
+        /* ADDED CSS RULE: Initially hides the logic explanation */
+        .hidden-logic {
+            display: none; 
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>5th Period Java Project: GUI Calculator</h1>
+        <p>This page features the source code for our working graphical calculator, built using Java's Swing library.</p>
+
+        <div class="btn-group">
+            <button class="btn btn-green" onclick="copyContent('code-source')">Copy Code</button>
+            <a href = "FlappyBird.jar" download><button class="btn btn-green" >Download</button></a>
+            <button class="btn btn-info" onclick="toggleLogicVisibility()">Toggle Logic Display</button>
+            <button class="btn btn-crazy" onclick="goCrazyMonkeys()">Go Crazy! 🐒</button>
+        </div>
+        
+        <div id="datetime-output">
+            <!-- Date will appear here via JavaScript -->
+        </div>
+
+        <h2>Java Source Code: <code>CalculatorShell.java</code></h2>
+        <pre>
+<code id="code-source">
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import java.io.File;
+import java.net.URL;
+
+public class FlappyBird extends JPanel implements ActionListener, KeyListener {
+
+    public static final int WIDTH = 800;
+    public static final int HEIGHT = 600;
+    
+    private Timer timer;
+    private boolean gameOver = false;
+    private int score = 0;
+    // --- NEW: Reference to the audio clip ---
+    private Clip gameMusicClip; 
+
+    private Rectangle bird;
+    private int yVelocity = 0;
+    private final int GRAVITY = 1;
+    private final int JUMP_STRENGTH = -12;
+
+    private Rectangle pipe1Top, pipe1Bottom;
+    private Rectangle pipe2Top, pipe2Bottom;
+    private final int PIPE_WIDTH = 60;
+    private final int PIPE_GAP = 150;
+    private int PIPE_SPEED = 5;
+
+    public FlappyBird() {
+        pipe1Top = new Rectangle(WIDTH, 0, PIPE_WIDTH, 200);
+        pipe1Bottom = new Rectangle(WIDTH, 200 + PIPE_GAP, PIPE_WIDTH, HEIGHT - (200 + PIPE_GAP) - 100);
+        pipe2Top = new Rectangle(WIDTH + WIDTH/2, 0, PIPE_WIDTH, 300);
+        pipe2Bottom = new Rectangle(WIDTH + WIDTH/2, 300 + PIPE_GAP, PIPE_WIDTH, HEIGHT - (300 + PIPE_GAP) - 100);
+        bird = new Rectangle(100, HEIGHT/2, 30, 30);
+        this.setPreferredSize(new Dimension(WIDTH, HEIGHT));
+        this.setBackground(Color.CYAN);
+        this.setFocusable(true);
+        this.addKeyListener(this);
+
+        timer = new Timer(20, this);
+        timer.start();
+
+        playMusic("Bad Piggies theme 1 hour.wav");
+    }
+
+    public void playMusic(String musicFileName) {
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    URL soundUrl = getClass().getClassLoader().getResource(musicFileName);
+                    if (soundUrl == null) {
+                        File file = new File(musicFileName);
+                        if (!file.exists()) {
+                             System.out.println("Music file not found: " + musicFileName);
+                             return;
+                        }
+                        soundUrl = file.toURI().toURL();
+                    }
+                    
+                    AudioInputStream audioInput = AudioSystem.getAudioInputStream(soundUrl);
+                    // Assign the created clip to the global variable
+                    gameMusicClip = AudioSystem.getClip(); 
+                    gameMusicClip.open(audioInput);
+                    gameMusicClip.loop(Clip.LOOP_CONTINUOUSLY);
+                    gameMusicClip.start();
+                } catch (Exception ex) {
+                    System.out.println("Error playing music:");
+                    ex.printStackTrace();
+                }
+            }
+        }).start();
+    }
+    
+    // --- NEW Method: Stop the music playback ---
+    public void stopMusic() {
+        if (gameMusicClip != null && gameMusicClip.isRunning()) {
+            gameMusicClip.stop();
+        }
+    }
+
+    // --- NEW Method: Restart the music playback (for restarting the game) ---
+    public void restartMusic() {
+        if (gameMusicClip != null) {
+            gameMusicClip.setFramePosition(0); // Rewind to the beginning
+            gameMusicClip.loop(Clip.LOOP_CONTINUOUSLY);
+            gameMusicClip.start();
+        } else {
+            // If it somehow wasn't loaded, try loading it again
+            playMusic("Bad Piggies theme 1 hour.wav");
+        }
+    }
+    
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        update();
+        repaint();
+    }
+  
+    public void update() {
+        // ...
+        // Check Collisions
+        if (bird.intersects(pipe1Top) || bird.intersects(pipe1Bottom) ||
+            bird.intersects(pipe2Top) || bird.intersects(pipe2Bottom)) {
+            if (!gameOver) { // Check if this is the first time we detect game over
+                stopMusic(); // Stop music when dead
+            }
+            gameOver = true;
+            PIPE_SPEED = 0;
+        }
+
+        if (!gameOver) {
+            // ... (rest of the update logic) ...
+            yVelocity += GRAVITY;
+            bird.y += yVelocity;
+            PIPE_SPEED = 5;
+            
+            if (bird.y > HEIGHT - 120 || bird.y < 0) {
+                bird.y = (bird.y > HEIGHT - 120) ? HEIGHT - 120 : 0;
+                if (!gameOver) { // Check if this is the first time we detect game over
+                    stopMusic(); // Stop music when hitting floor/ceiling
+                }
+                gameOver = true;
+                PIPE_SPEED = 0;
+            }
+        }
+        // ... (Pipe movement/recycling logic remains the same) ...
+        pipe1Top.x -= PIPE_SPEED;
+        pipe1Bottom.x -= PIPE_SPEED;
+        pipe2Top.x -= PIPE_SPEED;
+        pipe2Bottom.x -= PIPE_SPEED;
+
+        // Recycle Pipes
+        if (pipe1Top.x + PIPE_WIDTH < 0) {
+            pipe1Top.x = WIDTH;
+            pipe1Bottom.x = WIDTH;
+            score++;
+            int newHeight = (int)(Math.random() * 300) + 50;
+            pipe1Top.height = newHeight;
+            pipe1Bottom.y = newHeight + PIPE_GAP;
+            pipe1Bottom.height = HEIGHT - (newHeight + PIPE_GAP) - 100;
+        }
+        if (pipe2Top.x + PIPE_WIDTH < 0) {
+            pipe2Top.x = WIDTH;
+            pipe2Bottom.x = WIDTH;
+            score++;
+            int newHeight = (int)(Math.random() * 300) + 50;
+            pipe2Top.height = newHeight;
+            pipe2Bottom.y = newHeight + PIPE_GAP;
+            pipe2Bottom.height = HEIGHT - (newHeight + PIPE_GAP) - 100;
+        }
+    }
+
+    @Override
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        // ... (Drawing logic remains the same) ...
+        g.setColor(Color.ORANGE);
+        g.fillRect(0, HEIGHT - 100, WIDTH, 100);
+        g.setColor(Color.GREEN);
+        g.fillRect(0, HEIGHT - 100, WIDTH, 20);
+        
+        g.setColor(Color.WHITE);
+        g.setFont(new Font("Arial", Font.BOLD, 50));
+        g.drawString("Score: " + score, WIDTH/2 - 20, 50);
+
+        g.setColor(Color.YELLOW);
+        g.fillRect(bird.x, bird.y, bird.width, bird.height);
+
+        g.setColor(Color.GREEN.darker());
+        g.fillRect(pipe1Top.x, pipe1Top.y, pipe1Top.width, pipe1Top.height);
+        g.fillRect(pipe1Bottom.x, pipe1Bottom.y, pipe1Bottom.width, pipe1Bottom.height);
+        
+        g.fillRect(pipe2Top.x, pipe2Top.y, pipe2Top.width, pipe2Top.height);
+        g.fillRect(pipe2Bottom.x, pipe2Bottom.y, pipe2Bottom.width, pipe2Bottom.height);
+
+        if (gameOver) {
+            g.setColor(Color.RED);
+            g.drawString("Game Over!", WIDTH/2 - 150, HEIGHT/2);
+            g.setFont(new Font("Arial", Font.PLAIN, 20));
+            g.drawString("Press Space to Restart", WIDTH/2 - 100, HEIGHT/2 + 50);
+        }
+    }
+
+    // Keyboard Stubs
+    @Override
+    public void keyTyped(KeyEvent e) {}
+    @Override
+    public void keyReleased(KeyEvent e) {}
+    @Override
+    public void keyPressed(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+            if (gameOver) {
+                // Reset Game State
+                bird.y = HEIGHT/2;
+                yVelocity = 0;
+                pipe1Top.x = WIDTH;
+                pipe1Bottom.x = WIDTH;
+                pipe2Top.x = WIDTH + WIDTH/2;
+                pipe2Bottom.x = WIDTH + WIDTH/2;
+                score = 0;
+                gameOver = false;
+                // --- NEW: Restart the music when the game restarts ---
+                restartMusic(); 
+            } else {
+                // Jump!
+                yVelocity = JUMP_STRENGTH;
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        JFrame frame = new JFrame("Flappy Bird");
+        FlappyBird game = new FlappyBird();
+        frame.add(game);
+        frame.pack();
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
+        frame.setResizable(false);
+    }
+}
+
+</code>
+        </pre>
+
+        <!-- ADDED DIV FOR LOGIC EXPLANATION -->
+        <div class="hidden-logic" id="logic-explanation">
+            <h3>Project Logic Explanation</h3>
+            <p>The Java program simulates a basic European roulette game where a user can bet on a single number, a color (Red/Black), or Odd/Even numbers.</p>
+            <ul>
+                <li>The `main` function manages the game loop and player balance.</li>
+                <li>`spinWheel()` uses a `Random` number generator to determine the winning number (0-36).</li>
+                <li>`checkWin()` compares the user's bet type and choice with the result of the spin and returns a boolean.</li>
+                <li>The code handles user input validation and calculates winnings based on typical roulette odds (35:1 for number, 1:1 for even chances).</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- The JavaScript to power the buttons and effects -->
+    <script>
+        // 1. Function to display current date and time on page load
+        function displayCurrentDateTime() {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+            const formattedDateTime = now.toLocaleDateString(undefined, options);
+            document.getElementById('datetime-output').textContent = `Page last loaded: ${formattedDateTime}`;
+        }
+
+        // 2. Function to copy code content to clipboard
+        function copyContent(elementId) {
+            const copyText = document.getElementById(elementId).textContent;
+            navigator.clipboard.writeText(copyText).then(() => {
+                alert("Source code copied to clipboard!");
+            }).catch(err => {
+                console.error('Could not copy text: ', err);
+            });
+        }
+
+        // 3. Function to toggle visibility of logic explanation
+        function toggleLogicVisibility() {
+            const logicDiv = document.getElementById('logic-explanation');
+            // Toggles the 'display: none' CSS rule
+            if (logicDiv.style.display === 'none' || logicDiv.style.display === '') {
+                logicDiv.style.display = 'block';
+            } else {
+                logicDiv.style.display = 'none';
+            }
+        }
+
+        // 4. Function for the "Go Crazy! 🐒" effect
+        function goCrazyMonkeys() {
+            const body = document.body;
+            const container = document.querySelector('.container');
+            const containerRect = container.getBoundingClientRect();
+            const monkeyCount = 10;
+            const emoji = ['🐒', '🐵', '🍌', '🦍', '🌳'];
+
+            for (let i = 0; i < monkeyCount; i++) {
+                const monkey = document.createElement('div');
+                monkey.classList.add('monkey');
+                monkey.textContent = emoji[Math.floor(Math.random() * emoji.length)];
+                
+                // Position monkeys randomly near the container
+                monkey.style.top = `${window.scrollY + containerRect.top + Math.random() * containerRect.height}px`;
+                monkey.style.left = `${containerRect.left + Math.random() * containerRect.width}px`;
+                
+                body.appendChild(monkey);
+
+                // Animate them flying off screen
+                setTimeout(() => {
+                    monkey.style.transform = `translate(${Math.random() * window.innerWidth * 2 - window.innerWidth}px, ${Math.random() * window.innerHeight * 2 - window.innerHeight}px) rotate(${Math.random() * 720}deg)`;
+                    monkey.style.opacity = '0';
+                }, 100);
+
+                // Remove them after animation finishes (3s transition + a little buffer)
+                setTimeout(() => {
+                    monkey.remove();
+                }, 3100);
+            }
+        }
+
+        // Run this function when the page loads
+        document.addEventListener('DOMContentLoaded', displayCurrentDateTime);
+
+    </script>
+</body>
+</html>

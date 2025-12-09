@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5th Period Java Project: Calculator</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+            line-height: 1.6;
+            position: relative; 
+            /* overflow: hidden; Removed this to allow scrolling */
+            min-height: 100vh; /* Changed from 10vh to ensure the page can scroll */
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 10;
+        }
+        pre {
+            background-color: #eee;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            border: 1px solid #ccc;
+        }
+        code {
+            font-family: monospace;
+            line-height: 1.4;
+        }
+        h1, h2 {
+            color: #0056b3;
+        }
+        .btn-group {
+            margin-bottom: 20px;
+        }
+        .btn {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 5px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-green { background-color: #28a745; }
+        .btn-info { background-color: #17a2b8; }
+        .btn-crazy { background-color: #ff5733; }
+        .btn:hover {
+            opacity: 0.9;
+        }
+        #datetime-output {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+        }
+        .monkey {
+            position: absolute;
+            font-size: 40px;
+            transition: all 3s linear; 
+            z-index: 1;
+            pointer-events: none;
+        }
+        /* ADDED CSS RULE: Initially hides the logic explanation */
+        .hidden-logic {
+            display: none; 
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>5th Period Java Project: GUI Calculator</h1>
+        <p>This page features the source code for our working graphical calculator, built using Java's Swing library.</p>
+
+        <div class="btn-group">
+            <button class="btn btn-green" onclick="copyContent('code-source')">Copy Code</button>
+            <a href = "Roulette.jar" download><button class="btn btn-green" >Download</button></a>
+            <button class="btn btn-info" onclick="toggleLogicVisibility()">Toggle Logic Display</button>
+            <button class="btn btn-crazy" onclick="goCrazyMonkeys()">Go Crazy! 🐒</button>
+        </div>
+        
+        <div id="datetime-output">
+            <!-- Date will appear here via JavaScript -->
+        </div>
+
+        <h2>Java Source Code: <code>CalculatorShell.java</code></h2>
+        <pre>
+<code id="code-source">
+import java.util.ArrayList;
+import java.util.Random;
+import java.util.Scanner;
+
+public class Roulette {
+    
+    
+    public static void main(String[] args) {
+        // Game variables
+        final int numSlots = 37;
+        ArrayList<Integer> slotNumbers = new ArrayList<>(numSlots);
+        
+        // Add the numbered slots to the ArrayList
+        for (int i = 0; i < numSlots; i++) {
+            slotNumbers.add(i);
+        }
+        
+        // Create a scanner object to collect user input
+        Scanner input = new Scanner(System.in);
+        
+        // Player variables
+        int playerBalance = 100;
+        boolean quit = false;
+
+        // Actual game logic
+        while (playerBalance > 0 && !quit) {
+            // Print out the options for the bet
+            System.out.print(printBettingOptions());
+            
+            // Get the user's choice of bet
+            int betChoice = input.nextInt();
+            System.out.println();
+            
+            // Validate user choice
+            while (betChoice < 1 || betChoice > 3) {
+                System.out.print("Please enter a valid option!\n\n -> ");
+                betChoice = input.nextInt();
+                System.out.println();
+            }
+            
+            System.out.print(printLineBreak());
+            
+            // Get the user's bet amount
+            System.out.print(prettyPrintInput("Enter a bet amount ($1-" + playerBalance + "):"));
+            int betAmount = input.nextInt();
+            System.out.println();
+            System.out.print(printLineBreak());
+            
+            while (betAmount < 0 || betAmount > playerBalance) {
+                System.out.print("Please enter a valid bet amount!\n\n -> ");
+                betAmount = input.nextInt();
+                System.out.println();
+            }
+            
+            // Subtract bet from balance
+            playerBalance -= betAmount;
+            
+            // Game makes bet with user's choice
+            String betResult = "";
+            int betResultInt = 0;
+            
+            if (betChoice == 1) {
+                betResultInt += makeNumBet();
+            } else if (betChoice == 2) {
+                betResult += makeColorBet();
+            } else {
+                betResultInt += makeOddEvenBet();
+            }
+            
+            // Spin the wheel
+            int wheelReturn = spinWheel();
+            System.out.print(printWheelResult(wheelReturn));
+            
+            // Check for a win
+            boolean checkedWin = checkWin(betChoice, betResult, betResultInt, wheelReturn);
+            
+            if (checkedWin) {
+                if (betChoice == 1) {
+                    // Add to total
+                    playerBalance += (11 * betAmount);
+                    
+                    // Win statement
+                    System.out.print(printLineBreak());
+                    System.out.println("You won " + (10 * betAmount) + " dollars and have " + playerBalance + " dollars left.\n");
+                    System.out.print(printLineBreak());
+                } else if (betChoice == 2) {
+                    // Add to total
+                    playerBalance += (3 * betAmount);
+                    
+                    // Win statement
+                    System.out.print(printLineBreak());
+                    System.out.println("You won " + (2 * betAmount) + " dollars and have " + playerBalance + " dollars left.\n");
+                    System.out.print(printLineBreak());
+                } else {
+                    // Add to total
+                    playerBalance += (2 * betAmount);
+                    
+                    // Win statement
+                    System.out.print(printLineBreak());
+                    System.out.println("You won " + (1 * betAmount) + " dollars and have " + playerBalance + " dollars left.\n");
+                    System.out.print(printLineBreak());
+                }
+            } 
+            else {
+                // Didn't win
+                System.out.print(printLineBreak());
+                System.out.println("You lost " + betAmount + " dollars and have " + playerBalance + " dollars left.\n");
+                System.out.print(printLineBreak());
+            }
+
+        }
+        
+        System.out.println("You ran out of money, get some more and come right back. You will win for sure next time!");
+    }
+    
+    // Function to get the color for a specific number
+    private static String getColor(int num) {
+        if (num == 0) {
+            return "GREEN";
+        }
+        else if (num % 2 == 0) {
+            return "BLACK";
+        }
+        else {
+            return "RED";
+        }
+    }
+    
+    // Game functions
+    private static int makeNumBet() {
+        Scanner input = new Scanner(System.in);
+        
+        System.out.print(prettyPrintInput("What number do you want to bet on (0-36)?:"));
+        
+        // Gather user input
+        int bettingSingleNumber = input.nextInt();
+        
+        // Check that it is a valid input
+        if (bettingSingleNumber <= 36) {
+            System.out.println("\nYou bet on number: " + bettingSingleNumber);
+            System.out.println();
+            System.out.print(printLineBreak());
+            
+            return bettingSingleNumber;
+        } else {
+            while (bettingSingleNumber > 36) {
+                System.out.println("Invalid betting number try again (0-36): ");
+                bettingSingleNumber = input.nextInt();
+                if (bettingSingleNumber <= 36) {
+                    System.out.println("\nYou bet on number: " + bettingSingleNumber + "n");
+                    System.out.println();
+                    System.out.print(printLineBreak());
+                    
+                    return bettingSingleNumber;
+                }
+            }
+            return 0;
+        }
+    }
+    
+    private static String makeColorBet() {
+        Scanner input = new Scanner(System.in);
+        
+        System.out.print(prettyPrintInput("What color do you want to bet on, '1' for RED, '2' for BLACK, or '3' for GREEN?:"));
+        
+        int bettingsingleColor = 5;
+        
+        while (bettingsingleColor > 3) {
+            bettingsingleColor = input.nextInt();
+            if (bettingsingleColor == 1) {
+                System.out.println("\nYou bet on 'RED'");
+                System.out.println();
+                System.out.print(printLineBreak());
+                
+                return "RED";
+            }
+            else if (bettingsingleColor == 2) {
+                System.out.println("\nYou bet on 'BLACK'");
+                System.out.println();
+                System.out.print(printLineBreak());
+                
+                return "BLACK";
+            }
+            else if (bettingsingleColor == 3) {
+                System.out.println("\nYou bet on 'GREEN'");
+                System.out.println();
+                System.out.print(printLineBreak());
+                
+                return "GREEN";
+            }
+            
+            System.out.print(prettyPrintInput("Invalid betting number bet on, '1' for RED, '2' for BLACK, or '3' for GREEN?:"));
+        }
+        return "0";
+    }
+    
+    private static int makeOddEvenBet() {
+        Scanner input = new Scanner(System.in);
+        
+        System.out.print(prettyPrintInput("What do you want to bet on, '1' for ODD  or  '2' for EVEN?:"));
+        
+        // Gather user input
+        int bettingEvenOrOdd = 3;
+        
+        while (bettingEvenOrOdd > 2) {
+            bettingEvenOrOdd = input.nextInt();
+            if (bettingEvenOrOdd == 1) {
+                System.out.println("\nYou bet on 'ODD'");
+                
+                return 1;
+            } else if(bettingEvenOrOdd == 2){
+                System.out.println("\nYou bet on 'EVEN'");
+                
+                return 0;
+            }
+            
+            System.out.println("Invalid betting number bet on, '1' for ODD  or  '2' for EVEN?: ");
+        }
+        return 9;
+    }
+
+    // Check if the user has won
+    private static boolean checkWin(int betType, String betResult, int betResultInt, int winningNum) {
+        if (betType == 1) {
+            if (winningNum == betResultInt) {
+                return true;
+            } else {
+                return false;
+            }
+        } else if (betType == 2) {
+            if (getColor(winningNum).equals(betResult)) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            if (winningNum % 2 == betResultInt) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+
+    // Function to get a random number, which will be used as the wheel's spin value
+    private static int spinWheel() {
+        Random spin = new Random();
+        int winningNumber = spin.nextInt(37);
+        return winningNumber;
+    }
+
+    // "Pretty print" functions
+    // Pretty print a generic string with an input attached
+    private static String prettyPrintInput(String str) {
+        return "\n\n" + printLineBreak() + str + "\n\n -> ";
+    }
+
+    // List the betting options
+    private static String printBettingOptions() {
+        return printWordOption() + "\n -> Type '1' if you want to bet on a single number\n -> Type '2' if you want to bet on a color\n -> Type '3' if you want to bet on if it is even or odd\n\n ** Type 'q' to quit\n\n" + printLineBreak() + " -> ";
+    }
+
+    private static String printLineBreak() {
+        return "-----------------------------------------------------------------\n\n";
+    }
+
+    private static String printWordOption() {
+        return "-----------------------------------------------------------------\n  ___  ___ _____ ___ ___  _  _ ___   _ \n / _ \\| _ \\_   _|_ _/ _ \\| \\| / __| (_)\n| (_) |  _/ | |  | | (_) | .` \\__ \\  _\n \\___/|_|   |_| |___\\___/|_|\\_|___/ (_)\n";
+    }
+    
+    private static String printWheelResult(int winningNum) {
+        return "\n\nThe winning number is " + winningNum + ", which is " + getColor(winningNum) + "\n\n";
+    }
+}
+</code>
+        </pre>
+
+        <!-- ADDED DIV FOR LOGIC EXPLANATION -->
+        <div class="hidden-logic" id="logic-explanation">
+            <h3>Project Logic Explanation</h3>
+            <p>The Java program simulates a basic European roulette game where a user can bet on a single number, a color (Red/Black), or Odd/Even numbers.</p>
+            <ul>
+                <li>The `main` function manages the game loop and player balance.</li>
+                <li>`spinWheel()` uses a `Random` number generator to determine the winning number (0-36).</li>
+                <li>`checkWin()` compares the user's bet type and choice with the result of the spin and returns a boolean.</li>
+                <li>The code handles user input validation and calculates winnings based on typical roulette odds (35:1 for number, 1:1 for even chances).</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- The JavaScript to power the buttons and effects -->
+    <script>
+        // 1. Function to display current date and time on page load
+        function displayCurrentDateTime() {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+            const formattedDateTime = now.toLocaleDateString(undefined, options);
+            document.getElementById('datetime-output').textContent = `Page last loaded: ${formattedDateTime}`;
+        }
+
+        // 2. Function to copy code content to clipboard
+        function copyContent(elementId) {
+            const copyText = document.getElementById(elementId).textContent;
+            navigator.clipboard.writeText(copyText).then(() => {
+                alert("Source code copied to clipboard!");
+            }).catch(err => {
+                console.error('Could not copy text: ', err);
+            });
+        }
+
+        // 3. Function to toggle visibility of logic explanation
+        function toggleLogicVisibility() {
+            const logicDiv = document.getElementById('logic-explanation');
+            // Toggles the 'display: none' CSS rule
+            if (logicDiv.style.display === 'none' || logicDiv.style.display === '') {
+                logicDiv.style.display = 'block';
+            } else {
+                logicDiv.style.display = 'none';
+            }
+        }
+
+        // 4. Function for the "Go Crazy! 🐒" effect
+        function goCrazyMonkeys() {
+            const body = document.body;
+            const container = document.querySelector('.container');
+            const containerRect = container.getBoundingClientRect();
+            const monkeyCount = 10;
+            const emoji = ['🐒', '🐵', '🍌', '🦍', '🌳'];
+
+            for (let i = 0; i < monkeyCount; i++) {
+                const monkey = document.createElement('div');
+                monkey.classList.add('monkey');
+                monkey.textContent = emoji[Math.floor(Math.random() * emoji.length)];
+                
+                // Position monkeys randomly near the container
+                monkey.style.top = `${window.scrollY + containerRect.top + Math.random() * containerRect.height}px`;
+                monkey.style.left = `${containerRect.left + Math.random() * containerRect.width}px`;
+                
+                body.appendChild(monkey);
+
+                // Animate them flying off screen
+                setTimeout(() => {
+                    monkey.style.transform = `translate(${Math.random() * window.innerWidth * 2 - window.innerWidth}px, ${Math.random() * window.innerHeight * 2 - window.innerHeight}px) rotate(${Math.random() * 720}deg)`;
+                    monkey.style.opacity = '0';
+                }, 100);
+
+                // Remove them after animation finishes (3s transition + a little buffer)
+                setTimeout(() => {
+                    monkey.remove();
+                }, 3100);
+            }
+        }
+
+        // Run this function when the page loads
+        document.addEventListener('DOMContentLoaded', displayCurrentDateTime);
+
+    </script>
+</body>
+</html>

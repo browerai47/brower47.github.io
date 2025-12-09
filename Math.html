@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5th Period Java Project: Calculator</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+            line-height: 1.6;
+            position: relative; 
+            /* overflow: hidden; Removed this line to allow scrolling */
+            min-height: 100vh; /* Changed from 10vh to 100vh to ensure the page can scroll */
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 10;
+        }
+        pre {
+            background-color: #eee;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            border: 1px solid #ccc;
+        }
+        code {
+            font-family: monospace;
+            line-height: 1.4;
+        }
+        h1, h2 {
+            color: #0056b3;
+        }
+        .btn-group {
+            margin-bottom: 20px;
+        }
+        .btn {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 5px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-green { background-color: #28a745; }
+        .btn-info { background-color: #17a2b8; }
+        .btn-crazy { background-color: #ff5733; }
+        .btn:hover {
+            opacity: 0.9;
+        }
+        #datetime-output {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+        }
+        .monkey {
+            position: absolute;
+            font-size: 40px;
+            transition: all 3s linear; 
+            z-index: 1;
+            pointer-events: none;
+        }
+        /* ADDED CSS RULE: Initially hides the logic explanation */
+        .hidden-logic {
+            display: none; 
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>5th Period Java Project: GUI Calculator</h1>
+        <p>This page features the source code for our working graphical calculator, built using Java's Swing library.</p>
+
+        <div class="btn-group">
+            <button class="btn btn-green" onclick="copyContent('code-source')">Copy Code</button>
+            <a href = "CalculatorShell.jar" download><button class="btn btn-green" >Download</button></a>
+            <button class="btn btn-info" onclick="toggleLogicVisibility()">Toggle Logic Display</button>
+            <button class="btn btn-crazy" onclick="goCrazyMonkeys()">Go Crazy! 🐒</button>
+        </div>
+        
+        <div id="datetime-output">
+            <!-- Date will appear here via JavaScript -->
+        </div>
+
+        <h2>Java Source Code: <code>CalculatorShell.java</code></h2>
+        <pre>
+<code id="code-source">
+import java.awt.GridLayout;
+import java.awt.event.*;
+import javax.swing.*;
+public class CalculatorShell implements ActionListener{ 
+    private JFrame frame;
+    private JTextField display;
+    private JButton button0, button1, button2, button3, button4, button5, button6, button7, button8, button9;
+    private JButton addButton, subButton, multiplyButton, divisionButton, equalButton, clearButton, decimalButton;
+    private double firstNumber = 0;
+    private double secondNumber = 0;
+    private String operation = "";
+    private boolean startNewNumber = true;
+    
+
+    //Constructuer
+    public CalculatorShell() {
+        firstNumber = 0;
+        secondNumber = 0;
+        operation = "";
+        startNewNumber = true;
+        frame = new JFrame();
+        frame.setTitle("Calculator");
+        frame.setDefaultCloseOperation(frame.EXIT_ON_CLOSE);
+        frame.setSize(400, 400);
+        display = new JTextField();
+        frame.add(display);
+        display.setText("0");
+
+        //bottons for numbers
+        button0 = new JButton("0");
+        frame.add(button0);
+        button1 = new JButton("1");
+        frame.add(button1);
+        button2 = new JButton("2");
+        frame.add(button2);
+        button3 = new JButton("3");
+        frame.add(button3);
+        button4 = new JButton("4");
+        frame.add(button4);
+        button5 = new JButton("5");
+        frame.add(button5);
+        button6 = new JButton("6");
+        frame.add(button6);
+        button7 = new JButton("7");
+        frame.add(button7);
+        button8 = new JButton("8");
+        frame.add(button8);
+        button9 = new JButton("9");
+        frame.add(button9);
+        //its the +,-,=,x and division button
+        addButton = new JButton("+");
+        frame.add(addButton);
+        subButton = new JButton("-");
+        frame.add(subButton);
+        multiplyButton = new JButton("x");
+        frame.add(multiplyButton);
+        divisionButton = new JButton("/");
+        frame.add(divisionButton);
+        equalButton = new JButton("=");
+        frame.add(equalButton);
+        decimalButton = new JButton(".");
+        frame.add(decimalButton);
+        //clear botton
+        clearButton = new JButton("Clear");
+        frame.add(clearButton);
+        //layout 
+        frame.setLayout(new GridLayout(2,4));
+        frame.setResizable(true);
+        //frame.pack();
+        frame.setVisible(true);
+
+        //JPanel
+        JPanel keypadPanel = new JPanel();
+        keypadPanel.setLayout(new GridLayout(5, 4, 5, 5));
+        frame.add(keypadPanel);
+        //row 1
+        keypadPanel.add(divisionButton);
+        keypadPanel.add(button7);
+        keypadPanel.add(button8);
+        keypadPanel.add(button9);
+        //row 2
+        keypadPanel.add(multiplyButton);
+        keypadPanel.add(button4);
+        keypadPanel.add(button5);
+        keypadPanel.add(button6);
+        //row 3
+        keypadPanel.add(subButton);
+        keypadPanel.add(button1);
+        keypadPanel.add(button2);
+        keypadPanel.add(button3);
+        //row 4
+        keypadPanel.add(addButton);
+        keypadPanel.add(button0);
+        keypadPanel.add(decimalButton);
+        keypadPanel.add(equalButton);
+        //row 5
+        keypadPanel.add(clearButton);
+
+        //register listener for buttons
+        registerListener(button0);
+        registerListener(button1);
+        registerListener(button2);
+        registerListener(button3);
+        registerListener(button4);
+        registerListener(button5);
+        registerListener(button6);
+        registerListener(button7);
+        registerListener(button8);
+        registerListener(button9);
+        registerListener(addButton);
+        registerListener(subButton);
+        registerListener(multiplyButton);
+        registerListener(divisionButton);
+        registerListener(decimalButton);
+        registerListener(equalButton);
+        registerListener(clearButton);
+
+
+
+    }
+
+    private void registerListener(JButton button){
+        button.addActionListener(this);
+    }
+    public static void main(String[] args){
+        CalculatorShell calc = new CalculatorShell();
+    }
+
+    @Override
+    public void actionPerformed (ActionEvent e){
+        Object source = e.getSource();
+        if (source == button0){
+            String correctText = display.getText();
+            if (correctText.equals("0") || startNewNumber){
+                display.setText("0");
+                startNewNumber = false;
+            }
+            else{
+                display.setText(correctText + "0");
+            }
+        }
+        else if (source == button1){
+            System.out.println("button1 is pressed");
+            String correctText = display.getText();
+            if (correctText.equals("0") || startNewNumber){
+                display.setText("1");
+                startNewNumber = false;
+            }
+            else{
+                display.setText(correctText + "1");
+            }
+        }
+        else if (source == button2){
+            System.out.println("button2 is pressed");
+            String correctText = display.getText();
+            if (correctText.equals("0") || startNewNumber){
+                display.setText("2");
+                startNewNumber = false;
+            }
+            else{
+                display.setText(correctText + "2");
+            }
+        }
+        else if (source == button3){
+            System.out.println("button3 is pressed");
+            String correctText = display.getText();
+            if (correctText.equals("0") || startNewNumber){
+                display.setText("3");
+                startNewNumber = false;
+            }
+            else{
+                display.setText(correctText + "3");
+            }
+        }
+        else if (source == button4){
+            System.out.println("button4 is pressed");
+            String correctText = display.getText();
+            if (correctText.equals("0") || startNewNumber){
+                display.setText("4");
+                startNewNumber = false;
+            }
+            else{
+                display.setText(correctText + "4");
+            }
+        }
+        else if (source == button5){
+            System.out.println("button5 is pressed");
+            String correctText = display.getText();
+            if (correctText.equals("0") || startNewNumber){
+                display.setText("5");
+                startNewNumber = false;
+            }
+            else{
+                display.setText(correctText + "5");
+            }
+        }
+        else if (source == button6){
+            System.out.println("button6 is pressed");
+            String correctText = display.getText();
+            if (correctText.equals("0") || startNewNumber){
+                display.setText("6");
+                startNewNumber = false;
+            }
+            else{
+                display.setText(correctText + "6");
+            }
+        }
+        else if (source == button7){
+            System.out.println("button7 is pressed");
+            String correctText = display.getText();
+            if (correctText.equals("0") || startNewNumber){
+                display.setText("7");
+                startNewNumber = false;
+            }
+            else{
+                display.setText(correctText + "7");
+            }
+        }
+        else if (source == button8){
+            System.out.println("button8 is pressed");
+            String correctText = display.getText();
+            if (correctText.equals("0") || startNewNumber){
+                display.setText("8");
+                startNewNumber = false;
+            }
+            else{
+                display.setText(correctText + "8");
+            }
+        }
+        else if (source == button9){
+            System.out.println("button9 is pressed");
+            String correctText = display.getText();
+            if (correctText.equals("0") || startNewNumber){
+                display.setText("9");
+                startNewNumber = false;
+            }
+            else{
+                display.setText(correctText + "9");
+            }
+        }
+        else if (source == addButton){
+            System.out.println("addButton is pressed");
+            firstNumber = Double.parseDouble(display.getText());
+            operation = "+";
+            startNewNumber = true;
+            display.setText("0");
+        }
+
+        else if (source == subButton){
+            System.out.println("subButton is pressed");
+            String correctText = display.getText();
+            firstNumber = Double.parseDouble(display.getText());
+            operation = "-";
+            startNewNumber = true;
+            display.setText("0");
+        }
+        else if (source == multiplyButton){
+            System.out.println("multiplyButton is pressed");
+            String correctText = display.getText();
+            firstNumber = Double.parseDouble(display.getText());
+            operation = "X";
+            startNewNumber = true;
+            display.setText("0");
+        }
+        else if (source == divisionButton){
+            System.out.println("divisionButton is pressed");
+            String correctText = display.getText();
+            firstNumber = Double.parseDouble(display.getText());
+            operation = "/";
+            startNewNumber = true;
+            display.setText("0");
+        }
+        else if (source == decimalButton){
+            System.out.println("decimalButton is pressed");
+            String correctText = display.getText();
+            if (startNewNumber){
+                correctText.equals("0.");
+                display.setText(".");
+                startNewNumber = false;
+            }
+            else if (!correctText.contains(".")){
+                    display.setText(correctText + ".");
+            }
+            
+
+            else{
+                display.setText(correctText + ".");
+            }
+        }
+        else if (source == equalButton){
+            System.out.println("=");
+            secondNumber = Double.parseDouble(display.getText());
+            double result = calculateResult(secondNumber, firstNumber, operation);
+            display.setText(Double.toString(result));
+            
+        }
+        else if (source == clearButton){
+            firstNumber = 0;
+            secondNumber = 0;
+            operation = "";
+            startNewNumber = true;
+            display.setText("0");
+        }
+    }
+    private double calculateResult(double secondNumber, double firstNumber, String operation){
+        double result = 0;
+        if (operation.equals("+")){
+            result = (firstNumber + secondNumber);
+        }
+        else if (operation.equals("-")){
+        result = (firstNumber - secondNumber);
+        }
+        else if (operation.equals("X")){
+        result = (firstNumber * secondNumber);
+        }
+        else if (operation.equals("/")){
+        result = (firstNumber / secondNumber);
+        }
+        return result;
+
+    }
+}
+
+
+</code>
+        </pre>
+
+        <!-- ADDED DIV FOR LOGIC EXPLANATION -->
+        <div class="hidden-logic" id="logic-explanation">
+            <h3>Project Logic Explanation</h3>
+            <p>This program implements a graphical calculator using Java's Swing library. It creates a `JFrame` and arranges `JButton` elements in a grid layout.</p>
+            <ul>
+                <li>The `actionPerformed` method handles all button clicks.</li>
+                <li>Logic is implemented to manage basic arithmetic operations (+, -, x, /) using state variables (`firstNumber`, `secondNumber`, `operation`).</li>
+                <li>The `display` text field updates dynamically as the user enters numbers and operations.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- The JavaScript to power the buttons and effects -->
+    <script>
+        // 1. Function to display current date and time on page load
+        function displayCurrentDateTime() {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+            const formattedDateTime = now.toLocaleDateString(undefined, options);
+            document.getElementById('datetime-output').textContent = `Page last loaded: ${formattedDateTime}`;
+        }
+
+        // 2. Function to copy code content to clipboard
+        function copyContent(elementId) {
+            const copyText = document.getElementById(elementId).textContent;
+            navigator.clipboard.writeText(copyText).then(() => {
+                alert("Source code copied to clipboard!");
+            }).catch(err => {
+                console.error('Could not copy text: ', err);
+            });
+        }
+
+        // 3. Function to toggle visibility of logic explanation
+        function toggleLogicVisibility() {
+            const logicDiv = document.getElementById('logic-explanation');
+            // Toggles the 'display: none' CSS rule
+            if (logicDiv.style.display === 'none' || logicDiv.style.display === '') {
+                logicDiv.style.display = 'block';
+            } else {
+                logicDiv.style.display = 'none';
+            }
+        }
+
+        // 4. Function for the "Go Crazy! 🐒" effect
+        function goCrazyMonkeys() {
+            const body = document.body;
+            const container = document.querySelector('.container');
+            const containerRect = container.getBoundingClientRect();
+            const monkeyCount = 10;
+            const emoji = ['🐒', '🐵', '🍌', '🦍', '🌳'];
+
+            for (let i = 0; i < monkeyCount; i++) {
+                const monkey = document.createElement('div');
+                monkey.classList.add('monkey');
+                monkey.textContent = emoji[Math.floor(Math.random() * emoji.length)];
+                
+                // Position monkeys randomly near the container, respecting scroll position
+                monkey.style.top = `${window.scrollY + containerRect.top + Math.random() * containerRect.height}px`;
+                monkey.style.left = `${containerRect.left + Math.random() * containerRect.width}px`;
+                
+                body.appendChild(monkey);
+
+                // Animate them flying off screen
+                setTimeout(() => {
+                    monkey.style.transform = `translate(${Math.random() * window.innerWidth * 2 - window.innerWidth}px, ${Math.random() * window.innerHeight * 2 - window.innerHeight}px) rotate(${Math.random() * 720}deg)`;
+                    monkey.style.opacity = '0';
+                }, 100);
+
+                // Remove them after animation finishes (3s transition + a little buffer)
+                setTimeout(() => {
+                    monkey.remove();
+                }, 3100);
+            }
+        }
+
+        // Run this function when the page loads
+        document.addEventListener('DOMContentLoaded', displayCurrentDateTime);
+
+    </script>
+</body>
+</html>
